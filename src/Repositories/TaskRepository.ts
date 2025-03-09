@@ -12,21 +12,24 @@ export default class TaskRepository {
 
   async delete(id: number) {
     return this.prisma.task.delete({
-      where: {
-        id,
-      },
+      where: { id },
     });
   }
 
-  async save(
-    data:
-      | Prisma.XOR<Prisma.TaskCreateInput, Prisma.TaskUncheckedCreateInput>
-      | Prisma.XOR<Prisma.TaskUpdateInput, Prisma.TaskUncheckedUpdateInput>,
-  ) {
-    if (!data.id) {
-      // @todo IMPLEMENT HERE USING PRISMA API
-    }
+  async save(data: Prisma.TaskCreateInput | Prisma.TaskUpdateInput) {
+    if ('id' in data) {
+      const { id, ...updateData } = data as Prisma.TaskUncheckedUpdateInput;
 
-    // @todo IMPLEMENT HERE USING PRISMA API
+      return this.prisma.task.update({
+       where: { id: id as number },
+        data: updateData, 
+      });
+    } else {
+      
+      return this.prisma.task.create({
+        data: data as Prisma.TaskCreateInput, 
+      });
+    }
   }
 }
+
